@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Up</title>
+  <link rel="stylesheet" href="TeamUp.css" />
+</head>
+<body>
+  <header>
+    <!-- Optional header content -->
+  </header>
+
+  <div class="card-container">
+    <div class="card layout">
+      <nav class="sidebar">
+        <ul>
+          <li><a href="#">Profile</a></li>
+          <li><a href="#">Team</a></li>
+          <li><a href="#">Schedule</a></li>
+          <li><a href="#">Settings</a></li>
+        </ul>
+      </nav>
+
+      <main class="content">
+        <form>
+          <fieldset>
+            <legend>1. Which best describes your preferred working style in a group setting?</legend>
+            <label><input type="radio" name="q1"> I like to take the lead and organize tasks</label><br>
+            <label><input type="radio" name="q1"> I prefer to collaborate and discuss ideas as a group</label><br>
+            <label><input type="radio" name="q1"> I work best independently and contribute my part</label><br>
+            <label><input type="radio" name="q1"> I’m adaptable and fill in where needed</label>
+          </fieldset>
+
+          <fieldset>
+            <legend>2. How do you prefer to communicate with your teammates outside of class?</legend>
+            <label><input type="radio" name="q2"> Group chats (e.g., GroupMe, Discord, Slack)</label><br>
+            <label><input type="radio" name="q2"> Video or voice calls</label><br>
+            <label><input type="radio" name="q2"> Email or school platform messages</label><br>
+            <label><input type="radio" name="q2"> In-person meetings</label>
+          </fieldset>
+
+          <fieldset>
+            <legend>3. How would you rate your experience with front-end development?</legend>
+            <label><input type="radio" name="q3"> I’m new to front-end development</label><br>
+            <label><input type="radio" name="q3"> I’ve explored front-end basics through tutorials or coursework</label><br>
+            <label><input type="radio" name="q3"> I’ve built a functioning front-end for a project</label><br>
+            <label><input type="radio" name="q3"> I’m confident using frameworks and can troubleshoot front-end issues</label><br>
+            <label><input type="radio" name="q3"> I’ve led front-end development for a project or team</label>
+          </fieldset>
+
+          <fieldset>
+            <legend>4. How would you rate your experience with back-end development?</legend>
+            <label><input type="radio" name="q4"> I’m new to back-end development</label><br>
+            <label><input type="radio" name="q4"> I’ve done some coursework or followed tutorials</label><br>
+            <label><input type="radio" name="q4"> I’ve built server-side functionality or integrated a database</label><br>
+            <label><input type="radio" name="q4"> I’m comfortable with deploying and maintaining back-end systems</label><br>
+            <label><input type="radio" name="q4"> I’ve led or contributed significantly to back-end systems for a project or class</label>
+          </fieldset>
+
+          <fieldset>
+            <legend>5. What strengths or resources do you bring to a group project?</legend>
+            <label><input type="radio" name="q5"> Strong writing or documentation skills</label><br>
+            <label><input type="radio" name="q5"> Technical or coding abilities</label><br>
+            <label><input type="radio" name="q5"> Creative problem-solving</label><br>
+            <label><input type="radio" name="q5"> Project management or leadership</label><br>
+            <label><input type="radio" name="q5"> Research and information gathering</label>
+          </fieldset>
+
+          <div class="navigation-buttons">
+            <button class="NavButton" type="submit" formaction="CreateStudentProfile_StudentInterests.html">Back</button>
+            <button class="NavButton" type="submit" formaction="CreateStudentProfile_StudentAvailability.html">Next</button>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    <!-- Optional footer content -->
+  </footer>
+</body>
+</html>
