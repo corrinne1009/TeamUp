@@ -1,0 +1,101 @@
+--Note: Run each block of code separately starting at the top. 
+
+-- Account table
+CREATE TABLE Account (
+    accountId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    email TEXT NOT NULL,
+    password TEXT NOT NULL,
+    status TEXT CHECK (status IN ('active', 'inactive'))
+);
+
+-- User table
+CREATE TABLE User (
+    userId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    accountId INTEGER,
+    firstName TEXT,
+    lastName TEXT,
+    role TEXT CHECK (role IN ('student', 'instructor')),
+    FOREIGN KEY (accountId) REFERENCES Account(accountId)
+);
+
+-- Profile table
+CREATE TABLE Profile (
+    profileId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    userId INTEGER,
+    major TEXT,
+    graduationSemester TEXT CHECK (graduationSemester IN ('spring', 'summer', 'fall')),
+    graduationYear INTEGER,
+    bio TEXT,
+    interest1 TEXT,
+    interest2 TEXT,
+    interest3 TEXT,
+    q1Response TEXT,
+    q2Response TEXT,
+    q3Response TEXT,
+    q4Response TEXT,
+    q5Response TEXT,
+    FOREIGN KEY (userId) REFERENCES User(userId)
+);
+
+-- Availability table
+CREATE TABLE Availability (
+    availabilityId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    profileId INTEGER,
+    dayOfWeek TEXT CHECK (dayOfWeek IN 
+        ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')),
+    timeBlock TEXT CHECK (timeBlock IN 
+        ('morning', 'afternoon', 'evening', 'night')),
+    FOREIGN KEY (profileId) REFERENCES Profile(profileId)
+);
+
+-- Course table
+CREATE TABLE Course (
+    courseId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name TEXT,
+    section TEXT,
+    userId INTEGER,
+    FOREIGN KEY (userId) REFERENCES User(userId)
+);
+
+-- Teams table
+CREATE TABLE Teams (
+    teamId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    courseId INTEGER,
+    FOREIGN KEY (courseId) REFERENCES Course(courseId)
+);
+
+-- TeamMember junction table
+CREATE TABLE TeamMember (
+    teamId INTEGER,
+    userId INTEGER,
+    PRIMARY KEY (teamId, userId),
+    FOREIGN KEY (teamId) REFERENCES Teams(teamId),
+    FOREIGN KEY (userId) REFERENCES User(userId)
+);
+
+-- Enrollments table
+CREATE TABLE Enrollments (
+    enrollmentId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    userId INTEGER,
+    courseId INTEGER,
+    FOREIGN KEY (userId) REFERENCES User(userId),
+    FOREIGN KEY (courseId) REFERENCES Course(courseId)
+);
+
+-- TeamCriteria table
+CREATE TABLE TeamCriteria (
+    criteriaId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    courseId INTEGER,
+    numberOfTeams INTEGER,
+    priorityOrder INTEGER,
+    FOREIGN KEY (courseId) REFERENCES Course(courseId)
+);
+
+-- Messages table
+CREATE TABLE Messages (
+    messageId INTEGER PRIMARY KEY AUTO_INCREMENT,
+    message TEXT,
+    teamId INTEGER,
+    status TEXT CHECK (status IN ('read', 'unread')),
+    FOREIGN KEY (teamId) REFERENCES Teams(teamId)
+);
