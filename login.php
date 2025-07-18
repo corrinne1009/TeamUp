@@ -27,7 +27,6 @@ if (!password_verify($password, $account['password'])) {
     die("Login failed: incorrect password.");
 }
 
-
 $accountId = $account['accountId'];
 
 // Step 3: Fetch user role and profile ID
