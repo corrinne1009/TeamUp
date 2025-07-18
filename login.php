@@ -9,11 +9,11 @@ try {
     die("Connection failed: " . $e->getMessage());
 }
 
-// 📨 Get credentials from login form
+//Get credentials from login form
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 
-// ✅ Step 1: Check if the account exists and is active
+//Step 1: Check if the account exists and is active
 $stmt = $db->prepare("SELECT accountId, password FROM Account WHERE email = ? AND status = 'active'");
 $stmt->execute([$email]);
 $account = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -22,10 +22,11 @@ if (!$account) {
     die("Login failed: invalid email or inactive account.");
 }
 
-//Step 2: Verify password
-if ($password !== $account['password']) {
+//Step 2: Verify password. Password hashing for greater security
+if (!password_verify($password, $account['password'])) {
     die("Login failed: incorrect password.");
 }
+
 
 $accountId = $account['accountId'];
 
@@ -39,11 +40,6 @@ $stmt = $db->prepare("
 $stmt->execute([$accountId]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-//echo '<pre>';
-//var_dump($user);
-//echo '</pre>';
-//exit();
-
 if (!$user) {
     die("Login failed: no user found for this account.");
 }
@@ -53,7 +49,7 @@ $_SESSION['accountId'] = $accountId;
 $_SESSION['userId'] = $user['userId'];
 $_SESSION['role'] = $user['role'];
 
-// 🚦 Step 4: Redirect based on role and profile status
+//Step 4: Redirect based on role and profile status
 if ($user['role'] === 'student') {
     if (!isset($user['profileId']) || $user['profileId'] === null) {
         header("Location: CreateStudentProfile_StudentBio.php");
