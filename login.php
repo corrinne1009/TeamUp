@@ -53,7 +53,7 @@ if ($user['role'] === 'student') {
     if (!isset($user['profileId']) || $user['profileId'] === null) {
         header("Location: CreateStudentProfile_StudentBio.php");
     } else {
-        header("Location: studentProfile.html");
+        header("Location: studentProfile.php");
     }
     exit();
 
