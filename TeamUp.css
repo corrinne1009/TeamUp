@@ -772,3 +772,9 @@ input[type="checkbox"]:checked::after {
   font-weight: normal;
   cursor: pointer;
 }
+
+.error-message {
+  color: #d33;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
