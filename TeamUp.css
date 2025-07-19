@@ -18,6 +18,8 @@
 
 html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 * {
@@ -26,6 +28,7 @@ html, body {
 }
 
 body {
+  margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(to right,#F9F7F3, #F2ECE4);
   min-height: 100vh;
@@ -37,7 +40,18 @@ body {
   color: var(--text-dark);
 }
 
+
 /* Container */
+/* Header */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Adjust if navbar has a specific height */
+  width: 100%;
+  padding-top: 140px; /* If navbar is fixed */
+  box-sizing: border-box;
+}
 .login-container {
   background: #ffffff;
   padding: 2.5rem 2rem;
@@ -649,6 +663,8 @@ input[type="checkbox"]:checked::after {
 .member-tile img {
   width: 64px;
   height: 64px;
+  width: 70px;
+  height: 70px;
   object-fit: cover;
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -772,13 +788,6 @@ input[type="checkbox"]:checked::after {
   font-weight: normal;
   cursor: pointer;
 }
-
-.error-message {
-  color: #d33;
-  font-size: 0.9em;
-  margin-top: 4px;
-}
-
 /* Header from TeamUpHeader.html */
 .main-header {
   display: flex;
@@ -815,5 +824,4 @@ input[type="checkbox"]:checked::after {
 .main-nav .nav-list a:hover {
   text-decoration: underline;
 }
-
 
