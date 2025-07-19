@@ -7,10 +7,10 @@
   <link rel="stylesheet" href="TeamUp.css" />
 </head>
 <body>
+  
   <header>
-    <!-- Optional site-wide header content -->
+    <?php include 'Navbar.php'; ?>
   </header>
-
   <?php
 session_start();
 try {
