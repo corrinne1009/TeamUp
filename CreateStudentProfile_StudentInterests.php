@@ -12,7 +12,7 @@ session_start();
 ?>
 <body>
   <header>
-    <!-- Optional header content -->
+    <?php include 'Navbar.php'; ?>
   </header>
 
   <div class="card-container">
