@@ -43,6 +43,10 @@
   box-sizing: border-box;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   font-family: var(--font-base);
   font-size: var(--font-size-body);
@@ -51,6 +55,17 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 /* ===Header Navigation === */
@@ -920,3 +935,95 @@ footer {
   border-radius: 4px;
   cursor: pointer;
 }
+
+/* 🔧 Modal Wrapper */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(20, 20, 20, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/*Modal Content Box */
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(20, 20, 20, 0.65);
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+}
+
+.modal-content {
+  background-color: #f8f9fc;
+  border-radius: 8px;
+  padding: 2rem;
+  width: 450px;
+  max-width: 90%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.25);
+  position: relative;
+  font-family: 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+}
+
+/*Form Inputs */
+.modal-content input[type="number"],
+.modal-content select {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/*Labels */
+.modal-content label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+/*Buttons */
+.modal-content .btn-login {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content .btn-login:hover {
+  background-color: #0056b3;
+}
+
+.modal-content button[type="button"] {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button[type="button"]:hover {
+  background-color: #5a6268;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+
