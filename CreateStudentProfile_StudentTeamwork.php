@@ -17,7 +17,7 @@
         <ul>
           <li><a href="#">Bio</a></li>
           <li><a href="#">Interests</a></li>
-          <li><a href="#">Skills</a></li>
+          <li><a href="#" class="active">Skills</a></li>
           <li><a href="#">Availability</a></li>
         </ul>
       </nav>
@@ -68,8 +68,8 @@
           </fieldset>
 
           <div class="navigation-buttons">
-            <button class="NavButton" type="submit" formaction="CreateStudentProfile_StudentInterests.php">Back</button>
-            <button class="NavButton" type="submit" class="NavButton">Next</button>
+            <button class="btn-login" type="submit" formaction="CreateStudentProfile_StudentInterests.php">Back</button>
+            <button class="btn-login" type="submit">Next</button>
           </div>
         </form>
       </main>

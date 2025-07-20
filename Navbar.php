@@ -4,8 +4,9 @@
   <nav class="main-nav">
     <ul class="nav-list">
       <li><a href="HomePage.html">Home</a></li>
-      <li><a href="Login.html?role=instructor">Instructor</a></li>
-      <li><a href="Login.html?role=student">Student</a></li>
+      <li><a href="aboutTeamUp.html">About</a></li>
+      <a href="homepage.html" >Sign Out</a>
     </ul>
+</form>
   </nav>
 </header>
