@@ -20,7 +20,7 @@ session_start();
       <nav class="sidebar">
         <ul>
           <li><a href="#">Bio</a></li>
-          <li><a href="#">Interests</a></li>
+          <li><a href="#"class="active">Interests</a></li>
           <li><a href="#">Skills</a></li>
           <li><a href="#">Availability</a></li>
         </ul>
@@ -91,8 +91,8 @@ session_start();
           </div>
 
           <div class="navigation-buttons">
-            <button type="submit" formaction="CreateStudentProfile_StudentBio.php" class="NavButton">Back</button>
-            <button type="submit" class="NavButton">Next</button>
+            <button type="submit" formaction="CreateStudentProfile_StudentBio.php" class="btn-login">Back</button>
+            <button type="submit" class="btn-login">Next</button>
           </div>
           <div id="selectedInterests"></div>
         </form>

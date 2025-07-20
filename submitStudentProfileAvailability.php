@@ -13,13 +13,16 @@ if (!$userId) {
   die("User not logged in.");
 }
 
-// Get profileId for this user
+// Try to get existing profileId
 $stmt = $db->prepare("SELECT profileId FROM Profile WHERE userId = ?");
 $stmt->execute([$userId]);
 $profileId = $stmt->fetchColumn();
 
 if (!$profileId) {
-  die("Profile not found.");
+  // Create a new blank profile if none exists
+  $insertProfile = $db->prepare("INSERT INTO Profile (userId) VALUES (?)");
+  $insertProfile->execute([$userId]);
+  $profileId = $db->lastInsertId();
 }
 
 // Wipe existing availability to avoid duplicates

@@ -1,0 +1,87 @@
+<?php
+session_start();
+
+$errorMessage = '';
+
+// Check for and display any account-related message
+if (isset($_SESSION['no_account'])) {
+  $errorMessage = "Looks like you don’t have an account. Create an account to get started!";
+  unset($_SESSION['no_account']);
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TeamUp</title>
+  <link rel="stylesheet" href="TeamUp.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="main-header">
+    <img src="Final team-up logo.png" alt="TeamUp Logo" class="logo" />
+    <nav class="main-nav">
+      <ul class="nav-list">
+        <li><a href="aboutTeamUp.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="card-container">
+    <div class="card layout">
+
+      <!-- Left Column: Hero Logo & Welcome Text -->
+      <div class="content hero-logo">
+        <section>
+          <h1>Welcome to TeamUp</h1>
+          <p>Your hub for collaborative success—seamless teamwork, shared goals, and vibrant productivity.</p>
+        </section>
+        <img src="Team up final logo.png" alt="TeamUp Hero Logo" />
+      </div>
+
+      <!-- Right Column: Login Card -->
+      <div class="content">
+        <div class="login-container">
+          <header>
+            <h1>TeamUp</h1>
+            <p>Sign in to collaborate with your team</p>
+          </header>
+
+          <form class="login-form" action="login.php" method="POST">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="you@example.com" required />
+              <div id="email-feedback" class="feedback-message">
+                <?= htmlspecialchars($errorMessage) ?>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" placeholder="Enter your password" required />
+            </div>
+
+            <button type="submit" class="btn-login">Sign in</button>
+            <div class="form-footer">
+              <a href="ForgotPassword.php">Forgot password?</a>
+              <span> | </span>
+              <a href="SignUp.php">Create an account</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 TeamUp. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

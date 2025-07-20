@@ -1,66 +1,87 @@
 <?php
 session_start();
 
-// 🚪 Connect to MySQL (using XAMPP default credentials)
 try {
-    $db = new PDO("mysql:host=localhost;dbname=teamup;charset=utf8", "root", "");
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $db = new PDO("mysql:host=localhost;dbname=teamup;charset=utf8", "root", "");
+  $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+  die("Connection failed: " . $e->getMessage());
 }
 
-//Get credentials from login form
+// Get login credentials
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
 
-//Step 1: Check if the account exists and is active
+// Step 1: Check account exists and is active
 $stmt = $db->prepare("SELECT accountId, password FROM Account WHERE email = ? AND status = 'active'");
 $stmt->execute([$email]);
 $account = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$account) {
-    die("Login failed: invalid email or inactive account.");
+  die("Login failed: invalid email or inactive account.");
 }
 
-//Step 2: Verify password. Password hashing for greater security
+// Step 2: Verify password
 if (!password_verify($password, $account['password'])) {
-    die("Login failed: incorrect password.");
+  die("Login failed: incorrect password.");
 }
 
 $accountId = $account['accountId'];
 
-// Step 3: Fetch user role and profile ID
-$stmt = $db->prepare("
-    SELECT user.userId, user.role, profile.profileId
-    FROM user
-    LEFT JOIN profile on user.userId = profile.userId
-    WHERE user.accountId = ?
-"); 
+// Step 3: Fetch user info
+$stmt = $db->prepare("SELECT userId, role FROM User WHERE accountId = ?");
 $stmt->execute([$accountId]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {
-    die("Login failed: no user found for this account.");
+  die("Login failed: no user found for this account.");
 }
 
-//Store essentials in session
+$userId = $user['userId'];
 $_SESSION['accountId'] = $accountId;
-$_SESSION['userId'] = $user['userId'];
+$_SESSION['userId'] = $userId;
 $_SESSION['role'] = $user['role'];
 
-//Step 4: Redirect based on role and profile status
+// Step 4: Role-based redirect
 if ($user['role'] === 'student') {
-    if (!isset($user['profileId']) || $user['profileId'] === null) {
-        header("Location: CreateStudentProfile_StudentBio.php");
-    } else {
-        header("Location: studentProfile.php");
-    }
-    exit();
+
+  // Check profile completeness
+  $stmt = $db->prepare("
+    SELECT profileId, major, bio, graduationSemester, graduationYear
+    FROM Profile
+    WHERE userId = ?
+  ");
+  $stmt->execute([$userId]);
+  $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  $profileIncomplete = (
+    !$profile ||
+    empty($profile['major']) ||
+    empty($profile['bio']) ||
+    empty($profile['graduationSemester']) ||
+    empty($profile['graduationYear'])
+  );
+
+  if ($profileIncomplete) {
+    header("Location: CreateStudentProfile_StudentBio.php");
+    exit;
+  } else {
+    header("Location: studentProfile.php");
+    exit;
+  }
 
 } elseif ($user['role'] === 'instructor') {
-    header("Location: instructorPage.html");
-    exit();
+  // Check if instructor has any associated courses
+  $courseCheck = $db->prepare("SELECT COUNT(*) FROM Course WHERE userId = ?");
+  $courseCheck->execute([$userId]);
+  $courseCount = $courseCheck->fetchColumn();
+
+  if ($courseCount > 0) {
+    header("Location: instructorPage.php");
+  } else {
+    header("Location: InstructorSetUpPage.php");
+  }
+  exit;
 } else {
-    die("Unknown role. Please contact support.");
+  die("Unknown role. Please contact support.");
 }
-?>

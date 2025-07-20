@@ -18,7 +18,7 @@
           <li><a href="#">Bio</a></li>
           <li><a href="#">Interests</a></li>
           <li><a href="#">Skills</a></li>
-          <li><a href="#">Availability</a></li>
+          <li><a href="#" class="active">Availability</a></li>
         </ul>
       </nav>
 
@@ -30,7 +30,7 @@
           <table border="1" cellpadding="8">
             <thead>
               <tr>
-                <th>Day</th>
+                <th></th>
                 <th>Morning<br><small>(6:00 AM – 12:00 PM)</small></th>
                 <th>Afternoon<br><small>(12:00 PM – 5:00 PM)</small></th>
                 <th>Evening<br><small>(5:00 PM – 10:00 PM)</small></th>
@@ -208,8 +208,8 @@
           <br />
 
           <div class="navigation-buttons">
-            <a href="CreateStudentProfile_StudentTeamwork.php" class="NavButton">Back</a>
-            <button type="submit" class="NavButton">Finish</button>
+            <a href="CreateStudentProfile_StudentTeamwork.php" class="btn-login">Back</a>
+            <button type="submit" class="btn-login">Finish</button>
           </div>
         </form>
       </main>

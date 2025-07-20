@@ -13,7 +13,6 @@ if (!$userId) {
   die("User not logged in.");
 }
 
-// Fetch profile info
 $stmt = $db->prepare("
   SELECT U.firstName, U.lastName, P.major, P.graduationSemester, P.graduationYear, P.bio,
          P.interest1, P.interest2, P.interest3,
@@ -24,6 +23,22 @@ $stmt = $db->prepare("
 ");
 $stmt->execute([$userId]);
 $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$avatarFiles = glob("Profile_avatars/avatar*.png");
+$index = crc32($userId) % count($avatarFiles); // pseudo-random but consistent
+$assignedAvatar = $avatarFiles[$index];
+
+// Redirect to bio setup if profile is missing or required fields are empty
+if (
+  !$profile ||
+  empty($profile['major']) ||
+  empty($profile['bio']) ||
+  empty($profile['graduationSemester']) ||
+  empty($profile['graduationYear'])
+) {
+  header("Location: CreateStudentProfile_StudentBio.php");
+  exit;
+}
 
 // Fetch availability
 $availabilityStmt = $db->prepare("
@@ -42,6 +57,30 @@ foreach ($availabilityRows as $row) {
   $day = strtolower($row['dayOfWeek']);
   $grouped[$day][] = $row['timeBlock'];
 }
+
+// Fetch team ID for the user (via TeamMember)
+$teamIdStmt = $db->prepare("
+  SELECT teamId FROM TeamMember WHERE userId = ?
+");
+$teamIdStmt->execute([$userId]);
+$teamRow = $teamIdStmt->fetch(PDO::FETCH_ASSOC);
+$teamId = is_array($teamRow) ? $teamRow['teamId'] : null;
+
+// Fetch team members
+$teamMembers = [];
+if ($teamId) {
+  $teamMembersStmt = $db->prepare("
+    SELECT U.firstName, U.lastName
+    FROM TeamMember TM
+    JOIN User U ON TM.userId = U.userId
+    WHERE TM.teamId = ? AND TM.userId != ?
+  ");
+  $teamMembersStmt->execute([$teamId, $userId]);
+  $teamMembers = $teamMembersStmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Fetch team name (or assign placeholder if not available)
+$teamName = "Your Assigned Team";
 ?>
 <!DOCTYPE html>
 <html lang="en-US">
@@ -53,7 +92,7 @@ foreach ($availabilityRows as $row) {
 </head>
 <body class="profile_page">
   <header>
-    <!-- Optional header -->
+    <?php include 'Navbar.php'; ?>
   </header>
 
   <div class="card-container">
@@ -63,56 +102,54 @@ foreach ($availabilityRows as $row) {
       <div class="column column-1">
         <div class="card">
           <div class="profile-top">
-            <img src="Profile_pictures/placeholder_photo.png" alt="Profile Picture" class="profile-pic" />
+            <img src="<?= htmlspecialchars($assignedAvatar) ?>" alt="Profile Picture" class="profile-pic" />
             <div class="student-info">
               <h2><?= htmlspecialchars($profile['firstName'] . ' ' . $profile['lastName']) ?></h2>
               <p>Major: <?= htmlspecialchars($profile['major']) ?></p>
               <p>Graduation: <?= htmlspecialchars($profile['graduationSemester']) ?> <?= htmlspecialchars($profile['graduationYear']) ?></p>
+              <h3>Bio</h3>
+              <p><?= nl2br(htmlspecialchars($profile['bio'])) ?></p>
+              
+              <a href="TO DO" class="edit-link">Edit</a>
             </div>
           </div>
         </div>
 
         <div class="card">
           <div class="profile-bottom">
-            <h3>Bio</h3>
-            <p><?= nl2br(htmlspecialchars($profile['bio'])) ?></p>
+          <h3>Instructor Messages</h3>
+          <p>You have no messages</p>
           </div>
         </div>
       </div>
 
-      <!-- Column 2: Assigned Team -->
+      <!-- Column 2: Dynamic Team Display -->
       <div class="column column-2">
         <div class="card">
           <h3>Assigned Team</h3>
-          <p><strong>Team:</strong><br>Reactivators</p>
-          <p><strong>Members:</strong></p>
-          <ul class="team-list">
-            <li class="team-member">
-              <img src="Profile_pictures/Alex_M.png" alt="Alex M" class="mini-pic" />
-              <span class="member-name">Alex M</span>
-            </li>
-            <li class="team-member">
-              <img src="Profile_pictures/Taylor_R.png" alt="Taylor R" class="mini-pic" />
-              <span class="member-name">Taylor R</span>
-            </li>
-            <li class="team-member">
-              <img src="Profile_pictures/Jasmine_E.png" alt="Jasmine E" class="mini-pic" />
-              <span class="member-name">Jasmine E</span>
-            </li>
-            <li class="team-member">
-              <img src="Profile_pictures/Abed_Z.png" alt="Abed Z" class="mini-pic" />
-              <span class="member-name">Abed Z</span>
-            </li>
-          </ul>
+          <?php if ($teamId): ?>
+            <p><strong>Team:</strong><br><?= htmlspecialchars($teamName) ?></p>
+            <p><strong>Members:</strong></p>
+            <ul class="team-list">
+              <?php foreach ($teamMembers as $member): ?>
+              <li class="team-member">
+                <img src="Profile_pictures/default_student.png" alt="<?= htmlspecialchars($member['firstName']) ?>" class="mini-pic" />
+                <span class="member-name"><?= htmlspecialchars($member['firstName'] . ' ' . $member['lastName']) ?></span>
+              </li>
+              <?php endforeach; ?>
+            </ul>
+          <?php else: ?>
+            <p>You’re not assigned to a team yet.</p>
+          <?php endif; ?>
         </div>
       </div>
 
       <!-- Column 3: Interests + Availability -->
       <div class="column column-3">
-
         <div class="card">
           <div class="interests">
             <h3>Interests</h3>
+            <a href="TO DO" class="edit-link">Edit</a>
             <div class="interest-icons">
               <?php
               $interests = [$profile['interest1'], $profile['interest2'], $profile['interest3']];
@@ -131,6 +168,7 @@ foreach ($availabilityRows as $row) {
         <div class="card">
           <div class="availability">
             <h3>Availability</h3>
+            <a href="TO DO" class="edit-link">Edit</a>
             <div class="availability-grid horizontal">
               <?php foreach ($grouped as $day => $times): ?>
               <div class="availability-row">
@@ -145,7 +183,6 @@ foreach ($availabilityRows as $row) {
             </div>
           </div>
         </div>
-
       </div>
 
     </div>
