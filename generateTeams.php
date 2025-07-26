@@ -47,42 +47,111 @@ $studentStmt = $db->prepare("
 $studentStmt->execute([$courseId]);
 $studentsRaw = $studentStmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Group students by availability similarity
-$availabilityMap = [];
+// Step 1: Build slot frequency and student availability map
+$slotFrequency = [];
+$studentSlots = [];
+
 foreach ($studentsRaw as $student) {
   $userId = $student['userId'];
-  $raw = $student['availability'] ?? '';
-  $slots = $raw !== '' ? explode(',', $raw) : [];
+  $slots = explode(',', $student['availability']);
+  $studentSlots[$userId] = $slots;
 
-  // Sort and join to form a grouping key
-  sort($slots);
-  $slotKey = implode('|', array_unique($slots));
-
-  if (!isset($availabilityMap[$slotKey])) {
-    $availabilityMap[$slotKey] = [];
-  }
-  $availabilityMap[$slotKey][] = $userId;
-}
-
-// Flatten all users into one list for chunking
-$flattened = [];
-foreach ($availabilityMap as $group) {
-  foreach ($group as $userId) {
-    $flattened[] = $userId;
+  foreach ($slots as $slot) {
+    $slotFrequency[$slot] = ($slotFrequency[$slot] ?? 0) + 1;
   }
 }
 
-// Divide into roughly equal team chunks
-$teamChunks = array_chunk($flattened, ceil(count($flattened) / $numberOfTeams));
+// Step 2: Choose top N anchor slots
+arsort($slotFrequency);
+$anchorSlots = array_slice(array_keys($slotFrequency), 0, $numberOfTeams);
 
-// Insert each team and its members
-foreach ($teamChunks as $chunk) {
+// Step 3: Seed anchor-based groups
+$anchorGroups = [];
+$assigned = [];
+
+foreach ($anchorSlots as $slot) {
+  $anchorGroups[$slot] = [];
+  foreach ($studentSlots as $userId => $slots) {
+    if (in_array($slot, $slots) && !in_array($userId, $assigned)) {
+      $anchorGroups[$slot][] = $userId;
+      $assigned[] = $userId;
+    }
+  }
+}
+
+// Step 4: Normalize group sizes
+$totalStudents = count($studentSlots);
+$maxTeamSize = floor($totalStudents / $numberOfTeams);
+$remainder = $totalStudents % $numberOfTeams;
+
+// Fill anchor groups up to maxTeamSize
+foreach ($anchorGroups as $slot => &$group) {
+  foreach ($studentSlots as $userId => $slots) {
+    if (count($group) >= $maxTeamSize) break;
+    if (!in_array($userId, $assigned)) {
+      $group[] = $userId;
+      $assigned[] = $userId;
+    }
+  }
+}
+
+// Step 5: Assign remainders by best overlap
+$stillUnassigned = array_diff(array_keys($studentSlots), $assigned);
+foreach ($stillUnassigned as $userId) {
+  $bestFit = null;
+  $bestScore = -1;
+  $slots = $studentSlots[$userId];
+
+  foreach ($anchorGroups as $slot => $group) {
+    $score = 0;
+    foreach ($group as $memberId) {
+      $overlap = array_intersect($slots, $studentSlots[$memberId]);
+      $score += count($overlap);
+    }
+    if ($score > $bestScore) {
+      $bestScore = $score;
+      $bestFit = $slot;
+    }
+  }
+
+  if ($bestFit && !in_array($userId, $anchorGroups[$bestFit])) {
+    $anchorGroups[$bestFit][] = $userId;
+    $assigned[] = $userId;
+  }
+}
+
+// Final sanity check
+$finalAssigned = array_merge(...array_values($anchorGroups));
+$missing = array_diff(array_keys($studentSlots), $finalAssigned);
+
+if (!empty($missing)) {
+  // Fallback: assign remaining student(s) to smallest team
+  foreach ($missing as $userId) {
+    $smallestTeamKey = array_keys($anchorGroups)[0];
+    $minSize = PHP_INT_MAX;
+
+    foreach ($anchorGroups as $key => $group) {
+      if (count($group) < $minSize) {
+        $minSize = count($group);
+        $smallestTeamKey = $key;
+      }
+    }
+
+    if (!in_array($userId, $assigned)) {
+      $anchorGroups[$smallestTeamKey][] = $userId;
+      $assigned[] = $userId; 
+    }
+  }
+}
+$finalTeams = array_values($anchorGroups);
+
+foreach ($finalTeams as $teamMembers) {
   $teamInsert = $db->prepare("INSERT INTO teams (courseId) VALUES (?)");
   $teamInsert->execute([$courseId]);
   $teamId = $db->lastInsertId();
 
   $memberInsert = $db->prepare("INSERT INTO teammember (teamId, userId) VALUES (?, ?)");
-  foreach ($chunk as $userId) {
+  foreach (array_unique($teamMembers) as $userId) {
     $memberInsert->execute([$teamId, $userId]);
   }
 }
