@@ -1026,4 +1026,48 @@ body.modal-open {
   overflow: hidden;
 }
 
+/*Style for 'About' page*/
 
+.about-content {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+  padding: 30px;
+  flex-wrap: wrap;
+}
+
+.text-column {
+  flex: 2;
+  min-width: 300px;
+  text-align: left;
+}
+
+.image-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}*/
+
+/* Style for sections*/
+.mission, .how-it-works, .impact {
+  margin-bottom: 40px;
+}
+
+/* Remove bullets */
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li {
+  margin-bottom: 10px;
+}
+
+/* Optional responsive tweak*/
+@media screen and (max-width: 768px) {
+  .about-content {
+    flex-direction: column;
+  }
+}

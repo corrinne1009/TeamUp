@@ -8,10 +8,13 @@
 <body>
 
 <header>
-  <h1 class="page-title">About TeamUp</h1>
+  
+  <?php include 'Navbar.php'; ?>
 </header>
 
 <main class="about-content">
+  <div class="text-column">
+  <h1 class="page-title">About TeamUp</h1>
   <section class="mission">
     <h2>Our Mission</h2>
     <p>
@@ -24,13 +27,13 @@
       to form groups that are both cohesive and complementary.
     </p>
   </section>
-
+  
   <section class="how-it-works">
     <h2>How It Works</h2>
     <ul>
-      <li>🕒 Matches students with overlapping schedules to increase availability</li>
-      <li>🧠 Balances skills across teams to encourage peer learning</li>
-      <li>💬 Connects people with shared interests to foster team chemistry</li>
+      <li>Matches students with overlapping schedules to increase availability</li>
+      <li>Balances skills across teams to encourage peer learning</li>
+      <li>Connects people with shared interests to foster team chemistry</li>
     </ul>
     <p>
       Instructors can guide the process by choosing how teams are formed—setting priorities, reviewing drafts, and supporting students every step of the way.
@@ -44,6 +47,11 @@
       and grow from diverse perspectives. TeamUp turns group work from guesswork into growth.
     </p>
   </section>
+  </div>
+  <div class="image-column">
+      <img src="teamup1.jpg" alt="Students collaborating">
+      <img src="teamup2.jpg" alt="Algorithm dashboard">
+  </div>
 </main>
 
 <footer>
