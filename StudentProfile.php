@@ -108,9 +108,10 @@ $teamName = "Your Assigned Team";
               <p>Major: <?= htmlspecialchars($profile['major']) ?></p>
               <p>Graduation: <?= htmlspecialchars($profile['graduationSemester']) ?> <?= htmlspecialchars($profile['graduationYear']) ?></p>
               <h3>Bio</h3>
-              <p><?= nl2br(htmlspecialchars($profile['bio'])) ?></p>
-              
-              <a href="TO DO" class="edit-link">Edit</a>
+              <!-- edit button bio -->
+             <p><?= nl2br(htmlspecialchars($profile['bio'])) ?></p>
+            <a href="?edit=bio" class="NavButton" style="margin-top: 0.5rem;">Edit Bio</a>
+
             </div>
           </div>
         </div>
@@ -149,7 +150,10 @@ $teamName = "Your Assigned Team";
         <div class="card">
           <div class="interests">
             <h3>Interests</h3>
-            <a href="TO DO" class="edit-link">Edit</a>
+            
+           <a href="?edit=interests" class="NavButton" style="margin-top: 0.5rem;">Edit Interests</a>
+
+            
             <div class="interest-icons">
               <?php
               $interests = [$profile['interest1'], $profile['interest2'], $profile['interest3']];
@@ -168,7 +172,9 @@ $teamName = "Your Assigned Team";
         <div class="card">
           <div class="availability">
             <h3>Availability</h3>
-            <a href="TO DO" class="edit-link">Edit</a>
+            <a href="?edit=availability" class="NavButton" style="margin-top: 0.5rem;">Edit Availability</a>
+
+            
             <div class="availability-grid horizontal">
               <?php foreach ($grouped as $day => $times): ?>
               <div class="availability-row">
