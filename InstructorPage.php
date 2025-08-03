@@ -1,5 +1,5 @@
 <?php
-// 🛠️ Inline AJAX handler for team member info
+//Inline AJAX handler for team member info
 if (isset($_GET['teamId']) && isset($_GET['ajax'])) {
   header('Content-Type: application/json');
 
@@ -102,17 +102,16 @@ while ($row = $teamStmt->fetch(PDO::FETCH_ASSOC)) {
             </div>
           </div>
         </div>
-
         <div class="card">
-          <h3>Courses You Teach</h3>
+          <h3>Courses with no teams</h3>
           <ul class="course-list">
             <?php foreach ($courses as $course): ?>
-              <li>
-                <?= htmlspecialchars($course['name']) ?> — Section <?= htmlspecialchars($course['section']) ?>
-                <?php if ($course['teamCount'] == 0): ?>
+              <?php if ($course['teamCount'] == 0): ?>
+                <li>
+                  <?= htmlspecialchars($course['name']) ?> — Section <?= htmlspecialchars($course['section']) ?>
                   <button class="create-teams-btn" onclick="openTeamSetupModal(<?= $course['courseId'] ?>)">Create Teams</button>
-                <?php endif; ?>
-              </li>
+                </li>
+              <?php endif; ?>
             <?php endforeach; ?>
           </ul>
         </div>
@@ -121,12 +120,12 @@ while ($row = $teamStmt->fetch(PDO::FETCH_ASSOC)) {
       <!--Column 2: Teams per Course -->
       <div class="column column-2">
         <div class="card">
-          <h3>Teams per Course</h3>
+          <h3>Teams</h3>
           <div id="team-icon-wrapper">
-            <?php foreach ($courses as $course): ?>
-              <div class="team-section">
-                <h4><?= htmlspecialchars($course['name']) ?> – Sec <?= htmlspecialchars($course['section']) ?></h4>
-                <?php if (!empty($teamsByCourse[$course['courseId']])): ?>
+           <?php foreach ($courses as $course): ?>
+              <?php if (!empty($teamsByCourse[$course['courseId']])): ?>
+                <div class="team-section">
+                  <h4><?= htmlspecialchars($course['name']) ?> – Sec <?= htmlspecialchars($course['section']) ?></h4>
                   <ul class="team-list">
                     <?php foreach ($teamsByCourse[$course['courseId']] as $team): ?>
                       <li>
@@ -137,10 +136,8 @@ while ($row = $teamStmt->fetch(PDO::FETCH_ASSOC)) {
                       </li>
                     <?php endforeach; ?>
                   </ul>
-                <?php else: ?>
-                  <p>No teams yet.</p>
-                <?php endif; ?>
-              </div>
+                </div>
+              <?php endif; ?>
             <?php endforeach; ?>
           </div>
         </div>
@@ -188,10 +185,8 @@ while ($row = $teamStmt->fetch(PDO::FETCH_ASSOC)) {
         <input type="hidden" name="courseId" id="modalCourseId" value="">
         <p id="student-count-display">Loading student count...</p>
 
-        <p><strong><?= $count ?></strong> students are currently enrolled in this course.</p>
-
-        <label for="numTeams">Number of Teams</label>
-        <input type="number" name="numTeams" id="numTeams" min="1" required>
+        <label for="numberOfTeams">Number of Teams</label>
+        <input type="number" name="numberOfTeams" id="numTeams" min="1" required>
 
         <label>Criteria Priority</label>
         <select name="priority[]" multiple required>
@@ -208,55 +203,51 @@ while ($row = $teamStmt->fetch(PDO::FETCH_ASSOC)) {
 
   <!--JavaScript for Modal + Team Selection -->
   <script>
-    function openTeamSetupModal(courseId) {
-      document.getElementById("modalCourseId").value = courseId;
-      document.getElementById("team-setup-modal").style.display = "block";
-      document.body.classList.add("modal-open");
-    }
-
-    function closeTeamSetupModal() {
-      document.getElementById("team-setup-modal").style.display = "none";
-      document.body.classList.remove("modal-open");
-    }
-
-    function highlightTeam(teamId) {
-      document.getElementById("selectedTeamId").value = teamId;
-
-      fetch(`InstructorPage.php?ajax=1&teamId=${teamId}`)
-        .then(response => response.json())
-        .then(data => {
-          const container = document.getElementById("team-detail-view");
-          if (data.members && data.members.length > 0) {
-            container.innerHTML = `
-              <h4>Team #${teamId}</h4>
-              <ul class="team-members">
-                ${data.members.map(m => `<li>${m.firstName} ${m.lastName}</li>`).join('')}
-              </ul>
-            `;
-          } else {
-            container.innerHTML = `<p>No members found for this team.</p>`;
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching team info:', error);
-          document.getElementById("team-detail-view").innerHTML = `<p>Could not load team members.</p>`;
-        });
-    }
-    function openTeamSetupModal(courseId) {
+  function openTeamSetupModal(courseId) {
   document.getElementById("modalCourseId").value = courseId;
   document.getElementById("team-setup-modal").style.display = "block";
   document.body.classList.add("modal-open");
 
-  // Fetch student count dynamically
   fetch(`getStudentCount.php?courseId=${courseId}`)
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
       document.getElementById("student-count-display").textContent =
-        `${data.count} students are currently enrolled in this course.`;
+        `${data.count} student(s) are currently enrolled in this course.`;
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("student-count-display").textContent =
+        `Couldn't load student count.`;
+    });
+}
+
+// ✅ Move these out
+function closeTeamSetupModal() {
+  document.getElementById("team-setup-modal").style.display = "none";
+  document.body.classList.remove("modal-open");
+}
+
+function highlightTeam(teamId) {
+  document.getElementById("selectedTeamId").value = teamId;
+
+  fetch(`InstructorPage.php?ajax=1&teamId=${teamId}`)
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById("team-detail-view");
+      if (data.members && data.members.length > 0) {
+        container.innerHTML = `
+          <h4>Team #${teamId}</h4>
+          <ul class="team-members">
+            ${data.members.map(m => `<li>${m.firstName} ${m.lastName}</li>`).join('')}
+          </ul>
+        `;
+      } else {
+        container.innerHTML = `<p>No members found for this team.</p>`;
+      }
     })
     .catch(error => {
-      document.getElementById("student-count-display").textContent = "Couldn't load student count.";
-      console.error(error);
+      console.error('Error fetching team info:', error);
+      document.getElementById("team-detail-view").innerHTML = `<p>Could not load team members.</p>`;
     });
 }
   </script>
