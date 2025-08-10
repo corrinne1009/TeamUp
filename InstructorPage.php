@@ -154,10 +154,10 @@ while ($row = $teamStmt->fetch(PDO::FETCH_ASSOC)) {
 
         <div class="card">
           <h4>Message Team</h4>
-          <form method="post" action="SendMessageToTeam.php">
+          <form method="post" action="submitInstructorMessage.php">
             <input type="hidden" name="teamId" id="selectedTeamId" value="">
             <textarea name="messageBody" placeholder="Write your message here..." rows="5" required></textarea>
-            <button type="submit" class="btn-login">Send</button>
+            <button type="submit" class="btn-login disabled-tip" id="sendMessageBtn" disabled title="You must select a team to send a message.">Send</button>
           </form>
         </div>
       </div>
@@ -229,6 +229,32 @@ function closeTeamSetupModal() {
 
 function highlightTeam(teamId) {
   document.getElementById("selectedTeamId").value = teamId;
+
+  fetch(`InstructorPage.php?ajax=1&teamId=${teamId}`)
+    .then(response => response.json())
+    .then(data => {
+      const container = document.getElementById("team-detail-view");
+      if (data.members && data.members.length > 0) {
+        container.innerHTML = `
+          <h4>Team #${teamId}</h4>
+          <ul class="team-members">
+            ${data.members.map(m => `<li>${m.firstName} ${m.lastName}</li>`).join('')}
+          </ul>
+        `;
+      } else {
+        container.innerHTML = `<p>No members found for this team.</p>`;
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching team info:', error);
+      document.getElementById("team-detail-view").innerHTML = `<p>Could not load team members.</p>`;
+    });
+}
+function highlightTeam(teamId) {
+  document.getElementById("selectedTeamId").value = teamId;
+
+  // Enable the send button after instructor selects a team to send a message to
+  document.getElementById("sendMessageBtn").disabled = false;
 
   fetch(`InstructorPage.php?ajax=1&teamId=${teamId}`)
     .then(response => response.json())
