@@ -66,6 +66,19 @@ $teamIdStmt->execute([$userId]);
 $teamRow = $teamIdStmt->fetch(PDO::FETCH_ASSOC);
 $teamId = is_array($teamRow) ? $teamRow['teamId'] : null;
 
+//Fetch team messages from the instructor
+$teamMessages = [];
+if ($teamId) {
+  $messageStmt = $db->prepare("
+    SELECT message, status
+    FROM messages
+    WHERE teamId = ?
+    ORDER BY messageId DESC
+  ");
+  $messageStmt->execute([$teamId]);
+  $teamMessages = $messageStmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 // Fetch team members
 $teamMembers = [];
 if ($teamId) {
@@ -119,7 +132,17 @@ $teamName = "Your Assigned Team";
         <div class="card">
           <div class="profile-bottom">
           <h3>Instructor Messages</h3>
-          <p>You have no messages</p>
+          <?php if (!empty($teamMessages)): ?>
+  <ul class="message-list">
+    <?php foreach ($teamMessages as $msg): ?>
+      <li class="message-item <?= $msg['status'] === 'unread' ? 'unread' : 'read' ?>">
+        <?= nl2br(htmlspecialchars($msg['message'])) ?>
+      </li>
+    <?php endforeach; ?>
+  </ul>
+<?php else: ?>
+  <p>You have no messages.</p>
+<?php endif; ?>
           </div>
         </div>
       </div>
